@@ -1,0 +1,62 @@
+{
+  "box.py": {
+    "tags": ["box", "rectangular", "extrude", "basic", "solid"],
+    "desc": "기본 직육면체 생성"
+  },
+  "cylinder.py": {
+    "tags": ["cylinder", "circle", "extrude", "basic", "round"],
+    "desc": "원통 생성"
+  },
+  "sphere.py": {
+    "tags": ["sphere", "round", "basic", "ball"],
+    "desc": "구 생성"
+  },
+  "revolve.py": {
+    "tags": ["revolve", "rotation", "round", "lathe", "axis"],
+    "desc": "단면 프로파일을 축 기준으로 회전하여 솔리드 생성"
+  },
+  "loft.py": {
+    "tags": ["loft", "multi_section", "taper", "complex_shape"],
+    "desc": "여러 단면 프로파일을 연결하여 복잡한 형상 생성"
+  },
+  "sweep.py": {
+    "tags": ["sweep", "path", "profile", "tube", "pipe"],
+    "desc": "경로를 따라 프로파일을 이동시켜 솔리드 생성"
+  },
+  "extrude_cut.py": {
+    "tags": ["cut", "hole", "extrude", "boolean_cut", "subtract"],
+    "desc": "압출 컷으로 구멍 또는 홈 생성"
+  },
+  "boolean_join.py": {
+    "tags": ["join", "combine", "boolean_join", "multi_body", "fuse"],
+    "desc": "여러 솔리드 바디를 하나로 합치기"
+  },
+  "shell.py": {
+    "tags": ["shell", "hollow", "thin_wall", "open_face"],
+    "desc": "솔리드를 얇은 껍데기(쉘)로 변환"
+  },
+  "fillet.py": {
+    "tags": ["fillet", "round_edge", "smooth", "edge_treatment"],
+    "desc": "모서리를 둥글게 처리"
+  },
+  "chamfer.py": {
+    "tags": ["chamfer", "bevel", "edge_treatment", "45degree"],
+    "desc": "모서리를 사선으로 깎기"
+  },
+  "circular_pattern.py": {
+    "tags": ["pattern_circular", "array", "repeat", "radial", "hole_pattern"],
+    "desc": "원형 배열 패턴 생성"
+  },
+  "rectangular_pattern.py": {
+    "tags": ["pattern_rectangular", "array", "repeat", "grid", "linear"],
+    "desc": "사각형(격자) 배열 패턴 생성"
+  },
+  "mirror.py": {
+    "tags": ["mirror", "symmetry", "reflect", "plane"],
+    "desc": "평면 기준 대칭 복사"
+  },
+  "bolt_hole_plate.py": {
+    "tags": ["plate", "through_hole", "bolt_hole", "pattern_circular", "flange", "basic"],
+    "desc": "볼트 홀이 있는 플레이트"
+  }
+}

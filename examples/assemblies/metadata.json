@@ -1,0 +1,10 @@
+{
+  "l_bracket.py": {
+    "tags": ["bracket", "l_shape", "boolean_join", "through_hole", "assembly", "plate"],
+    "desc": "L자형 브라켓 (두 플레이트 결합 + 볼트홀)"
+  },
+  "gusset_bracket.py": {
+    "tags": ["bracket", "gusset", "triangle", "reinforcement", "assembly", "boolean_join"],
+    "desc": "거셋 브라켓 (삼각 보강재 포함)"
+  }
+}
