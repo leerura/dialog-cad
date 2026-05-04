@@ -1,7 +1,7 @@
 import base64
 
 from langchain_core.messages import AIMessage, HumanMessage
-from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_google_vertexai import ChatVertexAI
 
 from agent.prompts.parse import PARSE_PROMPT
 from agent.state import DialogCADState
@@ -9,8 +9,9 @@ from agent.utils.json_utils import extract_text_content, parse_json_response
 from agent.utils.token_tracker import track_tokens
 
 
+# TODO: GEMINI 예외 처리
 @track_tokens("parse_drawing")
-def parse_drawing_node(state: DialogCADState, model: ChatGoogleGenerativeAI) -> dict:
+def parse_drawing_node(state: DialogCADState, model: ChatVertexAI) -> dict:
     image_path = state.get("image_path")
     if not image_path:
         return {"messages": [AIMessage(content="❌ 도면 이미지가 없어요. 이미지를 업로드해주세요.")]}

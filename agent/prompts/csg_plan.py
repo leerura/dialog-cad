@@ -24,10 +24,15 @@ CSG_PLAN_PROMPT_TEMPLATE = """
 - cut(body_a, body_b) → 차집합 (body_b를 body_a에서 제거)
 - intersect(body_a, body_b) → 교집합
 
+## 좌표계 (중요)
+- **Y축 = 높이(수직)**, X축 = 좌우, Z축 = 앞뒤
+- 스케치는 XZ 평면(바닥)에서 시작하여 Y 방향으로 압출합니다.
+- position의 y값이 해당 body의 바닥 높이입니다.
+
 ## 회전 (rotation)
 - 프리미티브 step에 `"rotation"` 필드를 추가하면 해당 body가 생성 후 회전됩니다.
 - Fusion 360에서 MoveFeature로 구현됩니다.
-- 예: base가 45도 회전된 경우 → `"rotation": {{"axis": "z", "deg": 45}}`
+- 수평면 회전(탑뷰에서 돌아가 보이는 경우) → `"rotation": {{"axis": "y", "deg": 45}}`
 - 회전 없으면 `"rotation": null`
 
 ## 반환 형식 (JSON만, 다른 텍스트 없이)
@@ -41,19 +46,19 @@ CSG_PLAN_PROMPT_TEMPLATE = """
       "type": "box",
       "params": {{"width_mm": 100, "height_mm": 30, "depth_mm": 100}},
       "position": {{"x": 0, "y": 0, "z": 0}},
-      "rotation": {{"axis": "z", "deg": 45}},
+      "rotation": {{"axis": "y", "deg": 45}},
       "result_name": "base_body",
-      "desc": "베이스 박스 (Z축 45도 회전)"
+      "desc": "베이스 박스 (Y축 45도 회전, 탑뷰 기준 수평 회전)"
     }},
     {{
       "id": 2,
       "op": "primitive",
       "type": "cylinder",
       "params": {{"radius_mm": 15, "height_mm": 30}},
-      "position": {{"x": 0, "y": 0, "z": 60}},
+      "position": {{"x": 0, "y": 60, "z": 0}},
       "rotation": null,
       "result_name": "boss_body",
-      "desc": "원통형 보스"
+      "desc": "원통형 보스 (y=60 위치, 베이스 위에 배치)"
     }},
     {{
       "id": 3,
@@ -74,7 +79,7 @@ CSG_PLAN_PROMPT_TEMPLATE = """
 1. named_params의 변수명과 값을 params에 직접 사용하세요.
 2. 각 step은 하나의 오퍼레이션만 수행합니다.
 3. Boolean 오퍼레이션은 반드시 이전 step에서 생성된 body를 참조해야 합니다.
-4. position은 해당 body의 하단 중심 기준 절대 좌표입니다. Z축 = 높이.
+4. position은 해당 body의 하단 중심 기준 절대 좌표입니다. Y축 = 높이 (y값이 바닥 높이).
 5. 회전이 필요한 body는 rotation 필드를 반드시 채우세요 (null 아님).
 6. 예시 코드의 패턴을 최대한 따르세요.
 """

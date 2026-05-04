@@ -1,9 +1,12 @@
+import asyncio
 import json
 
 from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
 
 from agent.state import DialogCADState
 from agent.utils.token_tracker import track_tokens
+from fusion_mcp.api_docs import get_api_docs_for_plan
+from fusion_mcp.docs import get_fusion_best_practices
 
 
 @track_tokens("execute")
@@ -14,7 +17,23 @@ async def execute_node(state: DialogCADState, agent) -> dict:
     plan_text = json.dumps(csg_plan, ensure_ascii=False, indent=2)
     params_text = json.dumps(named_params, ensure_ascii=False, indent=2)
 
+    # best_practices와 API 문서를 병렬 fetch
+    best_practices, api_docs = await asyncio.gather(
+        get_fusion_best_practices(),
+        get_api_docs_for_plan(csg_plan),
+    )
+
+    api_docs_section = (
+        f"## 이 플랜에 필요한 Fusion 360 API 레퍼런스\n"
+        f"{api_docs}\n\n"
+        f"---\n\n"
+    ) if api_docs else ""
+
     instruction = (
+        f"## Fusion 360 API Best Practices (반드시 준수)\n"
+        f"{best_practices}\n\n"
+        f"---\n\n"
+        f"{api_docs_section}"
         f"아래 CSG 플랜과 파라미터를 사용하여 Fusion 360 스크립트를 작성하고 실행하세요.\n\n"
         f"## Named Parameters\n```json\n{params_text}\n```\n\n"
         f"## CSG Plan\n```json\n{plan_text}\n```\n\n"

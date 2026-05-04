@@ -2,7 +2,7 @@ import os
 from functools import partial
 
 from dotenv import load_dotenv
-from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_google_vertexai import ChatVertexAI
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import END, StateGraph
 from langgraph.prebuilt import create_react_agent
@@ -29,16 +29,18 @@ load_dotenv()
 
 def create_agent(tools: list):
     # 계획·추론 노드용: thinking 허용 (parse, csg_plan, verify)
-    planning_model = ChatGoogleGenerativeAI(
+    planning_model = ChatVertexAI(
         model="gemini-2.5-flash",
-        google_api_key=os.getenv("GEMINI_API_KEY"),
+        project=os.getenv("GCP_PROJECT_ID"),
+        location="us-central1",
         thinking_budget=2048,
     )
 
     # execute 에이전트용: thinking=0으로 완전히 끔 → 빈 응답 방지
-    execute_model = ChatGoogleGenerativeAI(
+    execute_model = ChatVertexAI(
         model="gemini-2.5-flash",
-        google_api_key=os.getenv("GEMINI_API_KEY"),
+        project=os.getenv("GCP_PROJECT_ID"),
+        location="us-central1",
         thinking_budget=0,
     )
 

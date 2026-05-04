@@ -1,5 +1,5 @@
 from langchain_core.messages import AIMessage, HumanMessage
-from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_google_vertexai import ChatVertexAI
 
 from agent.prompts.csg_plan import build_csg_plan_prompt
 from agent.state import DialogCADState
@@ -9,7 +9,7 @@ from agent.utils.token_tracker import track_tokens
 
 
 @track_tokens("csg_plan")
-def csg_plan_node(state: DialogCADState, model: ChatGoogleGenerativeAI) -> dict:
+def csg_plan_node(state: DialogCADState, model: ChatVertexAI) -> dict:
     named_params = state.get("named_params") or {}
     shape_tags = state.get("shape_tags") or []
     user_feedback = state.get("user_feedback")

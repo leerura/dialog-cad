@@ -1,5 +1,5 @@
 from langchain_core.messages import AIMessage, HumanMessage
-from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_google_vertexai import ChatVertexAI
 
 from agent.state import DialogCADState
 from agent.utils.json_utils import extract_text_content
@@ -12,6 +12,7 @@ VERIFY_PROMPT = """
 1. error 필드가 없거나 비어 있는가?
 2. stderr가 없거나 비어 있는가?
 3. 실행이 정상 완료됐는가?
+4. stdout에 "DONE: N bodies" 형태의 문자열이 있는가? (없으면 스크립트가 실제로 실행되지 않은 것)
 
 실행 결과:
 {result}
@@ -23,7 +24,7 @@ REASON: (실패 이유, pass면 생략)
 
 
 @track_tokens("verify")
-def verify_node(state: DialogCADState, model: ChatGoogleGenerativeAI) -> dict:
+def verify_node(state: DialogCADState, model: ChatVertexAI) -> dict:
     execution_result = state.get("execution_result", "")
 
     response = model.invoke([HumanMessage(content=VERIFY_PROMPT.format(result=execution_result))])
