@@ -1,7 +1,7 @@
 from langchain_core.messages import AIMessage, HumanMessage
 from langchain_google_vertexai import ChatVertexAI
 
-from agent.prompts.csg_plan import build_csg_plan_prompt
+from agent.prompts.csg_plan import build_csg_plan_modify_prompt, build_csg_plan_prompt
 from agent.state import DialogCADState
 from agent.utils.json_utils import extract_text_content, parse_json_response
 from agent.utils.rag import retrieve_examples
@@ -15,10 +15,12 @@ def csg_plan_node(state: DialogCADState, model: ChatVertexAI) -> dict:
     user_feedback = state.get("user_feedback")
 
     retrieved = retrieve_examples(shape_tags, top_k=3)
+    current_plan = state.get("csg_plan")
 
-    prompt_text = build_csg_plan_prompt(named_params, retrieved)
-    if user_feedback:
-        prompt_text += f"\n\n## 사용자 피드백 (반영 필요)\n{user_feedback}"
+    if user_feedback and current_plan:
+        prompt_text = build_csg_plan_modify_prompt(current_plan, user_feedback)
+    else:
+        prompt_text = build_csg_plan_prompt(named_params, retrieved)
 
     response = model.invoke([HumanMessage(content=prompt_text)])
     raw_text = extract_text_content(response.content)

@@ -85,9 +85,34 @@ CSG_PLAN_PROMPT_TEMPLATE = """
 """
 
 
+CSG_PLAN_MODIFY_TEMPLATE = """
+당신은 Fusion 360 CSG 모델링 전문가입니다.
+아래 현재 플랜에 사용자 피드백을 반영하여 수정된 플랜을 반환하세요.
+
+## 현재 플랜 (JSON)
+{current_plan_json}
+
+## 사용자 피드백
+{user_feedback}
+
+## 수정 규칙
+- 피드백에서 명시적으로 언급된 부분만 변경하세요.
+- 언급되지 않은 step과 필드는 원본 JSON 값을 그대로 유지하세요.
+- 반환 형식은 원본과 동일한 JSON 구조를 유지하세요 (JSON만, 다른 텍스트 없이).
+"""
+
+
 def build_csg_plan_prompt(named_params: dict, retrieved_examples: str) -> str:
     import json
     return CSG_PLAN_PROMPT_TEMPLATE.format(
         named_params_json=json.dumps(named_params, ensure_ascii=False, indent=2),
         retrieved_examples=retrieved_examples or "*(참고 예시 없음)*",
+    )
+
+
+def build_csg_plan_modify_prompt(current_plan: dict, user_feedback: str) -> str:
+    import json
+    return CSG_PLAN_MODIFY_TEMPLATE.format(
+        current_plan_json=json.dumps(current_plan, ensure_ascii=False, indent=2),
+        user_feedback=user_feedback,
     )
