@@ -67,12 +67,12 @@ def parse_drawing_node(state: DialogCADState, model: ChatVertexAI) -> dict:
 
     extracted_dims = data.get("views", data)
     named_params = data.get("named_params", {})
+    param_labels = data.get("param_labels", {})
     shape_tags = data.get("shape_tags", [])
 
     confirm_msg = AIMessage(content=(
         f"## 📐 추출된 치수\n\n"
-        f"{_format_dims(extracted_dims)}\n\n"
-        f"**파라미터**: {named_params}\n\n"
+        f"{_format_dims(extracted_dims, param_labels)}\n\n"
         f"**형상 태그**: {', '.join(shape_tags)}\n\n"
         "치수가 맞나요? 맞으면 **'확인'**, 틀리면 수정 내용을 알려주세요."
     ))
@@ -88,13 +88,37 @@ def parse_drawing_node(state: DialogCADState, model: ChatVertexAI) -> dict:
     }
 
 
-def _format_dims(dims: dict) -> str:
+def _format_named_params(params: dict, labels: dict) -> str:
+    lines = []
+    for key, val in params.items():
+        if key.endswith("_mm"):
+            unit = "mm"
+        elif key.endswith("_deg"):
+            unit = "°"
+        else:
+            unit = ""
+        unit_str = f" {unit}" if unit else ""
+        label = labels.get(key) or key  # 한국어 레이블 우선, 없으면 키 그대로
+        lines.append(f"  - {label}: **{val}{unit_str}**")
+    return "\n".join(lines)
+
+
+def _format_dims(dims: dict, labels: dict | None = None) -> str:
+    labels = labels or {}
+    view_names_ko = {"front": "정면도", "top": "평면도", "side": "측면도"}
     lines = []
     for view_name, view_data in dims.items():
-        lines.append(f"**{view_name}**")
-        if isinstance(view_data, dict):
+        view_title = view_names_ko.get(view_name, view_name)
+        lines.append(f"**{view_title}**")
+        if isinstance(view_data, dict) and view_data:
             for k, v in view_data.items():
-                lines.append(f"  - {k}: {v}")
+                label = labels.get(k, k)
+                if k.endswith("_mm"):
+                    lines.append(f"  - {label}: {v} mm")
+                elif k.endswith("_deg"):
+                    lines.append(f"  - {label}: {v}°")
+                else:
+                    lines.append(f"  - {label}: {v}")
         else:
-            lines.append(f"  {view_data}")
+            lines.append("  *(치수 없음)*")
     return "\n".join(lines)

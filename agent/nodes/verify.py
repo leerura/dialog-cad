@@ -23,9 +23,30 @@ REASON: (실패 이유, pass면 생략)
 """
 
 
+def _extract_body_count(result: str) -> int | None:
+    """stdout에서 'DONE: N bodies' 패턴으로 body 수 추출. 없으면 None."""
+    import re
+    m = re.search(r"DONE:\s*(\d+)\s*bodies", result or "")
+    return int(m.group(1)) if m else None
+
+
 @track_tokens("verify")
 def verify_node(state: DialogCADState, model: ChatVertexAI) -> dict:
     execution_result = state.get("execution_result", "")
+
+    # Hard-coded guard: body count가 0이면 LLM 호출 없이 즉시 fail
+    body_count = _extract_body_count(execution_result)
+    if body_count is not None and body_count == 0:
+        content = "RESULT: fail\nREASON: DONE: 0 bodies — 스크립트 실행 중 오류로 바디가 생성되지 않음"
+        print(f"[VERIFY] hard-fail (0 bodies) | {execution_result[:200]}")
+
+        retry_count = state.get("retry_count", 0)
+        return {
+            "verified": False,
+            "retry_count": retry_count + 1,
+            "messages": [AIMessage(content=f"❌ 실행 실패 (바디 0개).\n\n{content}")],
+            "last_token_usage": {},
+        }
 
     response = model.invoke([HumanMessage(content=VERIFY_PROMPT.format(result=execution_result))])
     content = extract_text_content(response.content)

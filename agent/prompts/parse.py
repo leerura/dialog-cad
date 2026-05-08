@@ -8,13 +8,21 @@ PARSE_PROMPT = """
 ```json
 {
   "views": {
-    "front": { ... },
-    "top": { ... },
-    "side": { ... }
+    "front": {
+      "변수명_mm": 숫자
+    },
+    "top": {
+      "변수명_mm": 숫자
+    },
+    "side": {
+      "변수명_mm": 숫자
+    }
   },
   "named_params": {
-    "변수명_mm": 숫자,
-    ...
+    "변수명_mm": 숫자
+  },
+  "param_labels": {
+    "변수명_mm": "한국어 설명"
   },
   "shape_tags": ["태그1", "태그2", ...],
   "notes": "불확실한 사항이 있으면 여기에"
@@ -26,6 +34,16 @@ PARSE_PROMPT = """
 - 단위는 mm, 변수명 끝에 `_mm` 접미사를 붙입니다.
 - 예: `base_width_mm`, `total_height_mm`, `hole_diameter_mm`, `flange_thickness_mm`
 - 반지름은 `_r_mm`, 각도는 `_deg`
+- 개수/배열 정보는 `_count` 접미사로 추출하세요. 예: `R5.00 × 2` → `mounting_hole_r_mm: 5, mounting_hole_count: 2`
+
+## param_labels 규칙
+- named_params의 각 키에 대응하는 **한국어 설명**입니다. views와 named_params에 등장하는 모든 변수명을 포함하세요.
+- 사용자가 치수를 검토할 때 이해할 수 있도록 간결하게 작성하세요.
+- 예: `"base_width_mm": "베이스 너비"`, `"hole_diameter_mm": "관통홀 지름"`, `"total_height_mm": "전체 높이"`
+
+## 중요
+- views의 front/top/side는 반드시 해당 뷰에서 읽은 치수를 채워야 합니다. 비워두지 마세요.
+- named_params는 views의 모든 값을 평탄화(flatten)한 것입니다.
 
 ## shape_tags 규칙
 - 형상을 설명하는 영문 소문자 태그 목록입니다.

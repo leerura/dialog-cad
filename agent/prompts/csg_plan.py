@@ -26,8 +26,21 @@ CSG_PLAN_PROMPT_TEMPLATE = """
 
 ## 좌표계 (중요)
 - **Y축 = 높이(수직)**, X축 = 좌우, Z축 = 앞뒤
-- 스케치는 XZ 평면(바닥)에서 시작하여 Y 방향으로 압출합니다.
-- position의 y값이 해당 body의 바닥 높이입니다.
+
+## 스케치 평면 (sketch_plane)
+프리미티브마다 어느 평면에서 스케치할지 명시해야 합니다:
+- `"xz"` — XZ 평면에서 스케치 → Y 방향으로 압출 (기본값, 수직 압출)
+- `"xy"` — XY 평면에서 스케치 → Z 방향으로 압출 (앞뒤 방향 관통)
+- `"yz"` — YZ 평면에서 스케치 → X 방향으로 압출 (좌우 방향 관통)
+
+도면 정면도에서 원이 보이는 피처 → 축이 Z 방향 → `"xy"` 사용
+도면 측면도에서 원이 보이는 피처 → 축이 X 방향 → `"yz"` 사용
+수직으로 쌓이는 피처 → `"xz"` 사용
+
+position 해석:
+- `"xz"` 평면: position.y = 스케치 시작 높이
+- `"xy"` 평면: position.z = 스케치 시작 깊이
+- `"yz"` 평면: position.x = 스케치 시작 X 위치
 
 ## 회전 (rotation)
 - 프리미티브 step에 `"rotation"` 필드를 추가하면 해당 body가 생성 후 회전됩니다.
@@ -46,19 +59,21 @@ CSG_PLAN_PROMPT_TEMPLATE = """
       "type": "box",
       "params": {{"width_mm": 100, "height_mm": 30, "depth_mm": 100}},
       "position": {{"x": 0, "y": 0, "z": 0}},
+      "sketch_plane": "xz",
       "rotation": {{"axis": "y", "deg": 45}},
       "result_name": "base_body",
-      "desc": "베이스 박스 (Y축 45도 회전, 탑뷰 기준 수평 회전)"
+      "desc": "베이스 박스 (XZ 평면, Y 방향 압출)"
     }},
     {{
       "id": 2,
       "op": "primitive",
       "type": "cylinder",
-      "params": {{"radius_mm": 15, "height_mm": 30}},
-      "position": {{"x": 0, "y": 60, "z": 0}},
+      "params": {{"radius_mm": 15, "height_mm": 40}},
+      "position": {{"x": 0, "y": 60, "z": -20}},
+      "sketch_plane": "xy",
       "rotation": null,
       "result_name": "boss_body",
-      "desc": "원통형 보스 (y=60 위치, 베이스 위에 배치)"
+      "desc": "수평 보스 (XY 평면, Z 방향 압출 — 정면도에서 원으로 보이는 피처, rotation 사용 금지)"
     }},
     {{
       "id": 3,
@@ -80,8 +95,9 @@ CSG_PLAN_PROMPT_TEMPLATE = """
 2. 각 step은 하나의 오퍼레이션만 수행합니다.
 3. Boolean 오퍼레이션은 반드시 이전 step에서 생성된 body를 참조해야 합니다.
 4. position은 해당 body의 하단 중심 기준 절대 좌표입니다. Y축 = 높이 (y값이 바닥 높이).
-5. 회전이 필요한 body는 rotation 필드를 반드시 채우세요 (null 아님).
-6. 예시 코드의 패턴을 최대한 따르세요.
+5. 수평 방향 피처(정면도/측면도에서 원으로 보이는 실린더 등)는 sketch_plane으로 방향을 지정하세요. rotation으로 눕히지 마세요.
+6. 탑뷰 기준 수평 회전이 필요한 body만 rotation 필드를 채우세요.
+7. named_params에 `_count`가 있으면 해당 개수만큼 primitive step을 생성하세요.
 """
 
 
