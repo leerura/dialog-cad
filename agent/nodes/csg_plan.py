@@ -20,7 +20,7 @@ def csg_plan_node(state: DialogCADState, model: ChatVertexAI) -> dict:
     if user_feedback and current_plan:
         prompt_text = build_csg_plan_modify_prompt(current_plan, user_feedback)
     else:
-        prompt_text = build_csg_plan_prompt(named_params, retrieved)
+        prompt_text = build_csg_plan_prompt(named_params, retrieved, shape_tags)
 
     response = model.invoke([HumanMessage(content=prompt_text)])
     raw_text = extract_text_content(response.content)
@@ -66,7 +66,11 @@ def _format_plan(plan: dict) -> str:
         desc = step.get("desc", "")
         op = step.get("op", "")
         stype = step.get("type", "")
-        lines.append(f"{sid}. [{op}/{stype}] {desc}")
+        rotation = step.get("rotation")
+        rot_str = ""
+        if rotation and isinstance(rotation, dict):
+            rot_str = f" 🔄 rotation: {rotation.get('axis','?').upper()} {rotation.get('deg','?')}°"
+        lines.append(f"{sid}. [{op}/{stype}] {desc}{rot_str}")
     if plan.get("notes"):
         lines.append(f"\n> {plan['notes']}")
     return "\n".join(lines)

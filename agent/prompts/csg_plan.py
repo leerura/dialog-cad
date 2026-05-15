@@ -5,6 +5,12 @@ CSG_PLAN_PROMPT_TEMPLATE = """
 ## 추출된 치수 (named_params)
 {named_params_json}
 
+## 형상 태그 (shape_tags)
+{shape_tags}
+
+이 태그를 참고하여 각 피처의 타입(box/cylinder 등)을 판단하세요.
+예: `cylinder` 또는 `boss` 태그가 있으면 해당 피처는 cylinder로 생성하세요.
+
 ## 참고 예시 코드
 {retrieved_examples}
 
@@ -92,6 +98,7 @@ position 해석:
 
 ## 작성 규칙
 1. named_params의 변수명과 값을 params에 직접 사용하세요.
+   named_params에 없는 치수는 절대 가정하거나 추정하지 마세요. 치수가 부족한 피처는 생성하지 말고 notes에 "XXX 치수 누락"으로 기재하세요.
 2. 각 step은 하나의 오퍼레이션만 수행합니다.
 3. Boolean 오퍼레이션은 반드시 이전 step에서 생성된 body를 참조해야 합니다.
 4. position은 해당 body의 하단 중심 기준 절대 좌표입니다. Y축 = 높이 (y값이 바닥 높이).
@@ -115,13 +122,17 @@ CSG_PLAN_MODIFY_TEMPLATE = """
 - 피드백에서 명시적으로 언급된 부분만 변경하세요.
 - 언급되지 않은 step과 필드는 원본 JSON 값을 그대로 유지하세요.
 - 반환 형식은 원본과 동일한 JSON 구조를 유지하세요 (JSON만, 다른 텍스트 없이).
+- rotation 관련 피드백은 반드시 해당 step의 `"rotation"` JSON 필드를 추가/수정하세요. description 텍스트 변경만으로는 부족합니다.
+  예: "베이스 45도 회전" → 해당 step에 `"rotation": {{"axis": "y", "deg": 45}}` 추가 (Y축 = 수직축, 탑뷰 기준 수평 회전)
 """
 
 
-def build_csg_plan_prompt(named_params: dict, retrieved_examples: str) -> str:
+def build_csg_plan_prompt(named_params: dict, retrieved_examples: str, shape_tags: list | None = None) -> str:
     import json
+    tags_str = ", ".join(shape_tags) if shape_tags else "*(태그 없음)*"
     return CSG_PLAN_PROMPT_TEMPLATE.format(
         named_params_json=json.dumps(named_params, ensure_ascii=False, indent=2),
+        shape_tags=tags_str,
         retrieved_examples=retrieved_examples or "*(참고 예시 없음)*",
     )
 

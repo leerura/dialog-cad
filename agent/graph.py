@@ -36,12 +36,11 @@ def create_agent(tools: list):
         thinking_budget=2048,
     )
 
-    # execute 에이전트용: thinking=0으로 완전히 끔 → 빈 응답 방지
+    # execute 에이전트용
     execute_model = ChatGoogleGenerativeAI(
         model="gemini-2.5-pro",
         project=os.getenv("GCP_PROJECT_ID"),
         location="us-central1",
-        #thinking_budget=0,
     )
 
     react_agent = create_react_agent(

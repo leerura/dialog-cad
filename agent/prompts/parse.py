@@ -35,6 +35,10 @@ PARSE_PROMPT = """
 - 예: `base_width_mm`, `total_height_mm`, `hole_diameter_mm`, `flange_thickness_mm`
 - 반지름은 `_r_mm`, 각도는 `_deg`
 - 개수/배열 정보는 `_count` 접미사로 추출하세요. 예: `R5.00 × 2` → `mounting_hole_r_mm: 5, mounting_hole_count: 2`
+- 피처 타입에 맞는 네이밍을 사용하세요:
+  박스/직육면체 형상 → `*_block_*` 또는 `*_plate_*`  예: `base_block_height_mm`, `middle_block_width_mm`
+  원통형 보스/실린더 → `boss_*` 또는 `cylinder_*`    예: `boss_r_mm`, `boss_height_mm`
+  관통홀/구멍        → `hole_*` 또는 `*_hole_*`       예: `hole_r_mm`, `center_hole_depth_mm`
 
 ## param_labels 규칙
 - named_params의 각 키에 대응하는 **한국어 설명**입니다. views와 named_params에 등장하는 모든 변수명을 포함하세요.

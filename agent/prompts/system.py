@@ -60,6 +60,16 @@ Always wrap the entire body in try/except and print the traceback to stdout:
 import adsk.core, adsk.fusion, traceback
 try:
     app = adsk.core.Application.get()
+    design = adsk.fusion.Design.cast(app.activeProduct)
+    root = design.rootComponent
+
+    # Clear existing geometry from previous runs
+    for i in range(design.timeline.count - 1, -1, -1):
+        try:
+            design.timeline.item(i).entity.deleteMe()
+        except Exception:
+            pass
+
     # ... all your code ...
     print(f"DONE: {root.bRepBodies.count} bodies")
 except Exception:
